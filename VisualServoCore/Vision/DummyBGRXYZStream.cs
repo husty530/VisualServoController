@@ -15,8 +15,8 @@ namespace VisualServoCore.Vision
 
         private readonly bool _isFileSource;
         private readonly object _lockObj = new();
-        private int _posIndex;
-        private BgrXyzMat _red2mz = new(
+        private readonly int _posIndex;
+        private readonly BgrXyzMat _red2mz = new(
             new Mat(180, 320, MatType.CV_8UC3, new(0, 0, 180)), 
             new Mat(180, 320, MatType.CV_16UC3, new(0, 0, 2000))
         );

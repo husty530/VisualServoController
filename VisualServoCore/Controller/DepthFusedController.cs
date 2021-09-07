@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using OpenCvSharp;
+using Husty.OpenCvSharp;
 using Husty.OpenCvSharp.DepthCamera;
 
 namespace VisualServoCore.Controller
@@ -13,7 +14,7 @@ namespace VisualServoCore.Controller
 
         // ------ Fields ------ //
 
-
+        private readonly YoloDetector _detector;
 
         // ------ Constructors ------ //
 
@@ -22,7 +23,10 @@ namespace VisualServoCore.Controller
 
             // initialize detector instance and some parameters
 
-            // ---
+            var cfg = "..\\..\\..\\..\\..\\model\\_.cfg";
+            var weights = "..\\..\\..\\..\\..\\model\\_.weights";
+            var names = "..\\..\\..\\..\\..\\model\\_.names";
+            _detector = new(cfg, weights, names, new(512, 288), 0.5f);
 
         }
 
@@ -31,12 +35,30 @@ namespace VisualServoCore.Controller
 
         public (double Speed, double Steer) Run(BgrXyzMat input)
         {
+
+            var w = input.BGR.Width;
+            var h = input.BGR.Height;
+            var centers = _detector.Run(input.BGR)
+                .Where(r => r.Label == "person")
+                .Where(r => r.Probability > 0.5)
+                .Select(r =>
+                {
+                    r.DrawBox(input.BGR, new(0, 0, 160), 2);
+                    return r.ScaledCenter(w, h);
+                })
+                .Select(r => input.GetPointInfo(r).Vector3);
+            
+            // generate steering angle from image processing and 3D coordinate information
+
             var speed = 0.0;
             var steer = 0.0;
 
-            // generate steering angle from image processing and 3D coordinate information
+            foreach (var c in centers)
+            {
 
-            // ---
+                Console.WriteLine($"XYZ = {c.X}, {c.Y}, {c.Z}");
+
+            }
 
             return (speed, steer);
         }

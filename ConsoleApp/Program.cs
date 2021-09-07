@@ -15,9 +15,9 @@ namespace ConsoleApp
             //IVision<Mat> cap = new DummyBGRStream();
             //IController<Mat> controller = new DummyColorBasedController();
 
-            //IDepthCamera camera = new Realsense(new(640, 360), 10);
-            IVision<BgrXyzMat> cap = new DummyBGRXYZStream();
-            IController<BgrXyzMat> controller = new DummyDepthFusedController();
+            IDepthCamera camera = new Realsense(new(640, 360));
+            IVision<BgrXyzMat> cap = new BGRXYZStream(camera);
+            IController<BgrXyzMat> controller = new DepthFusedController();
 
             ICommunication<string> server = new DummyCommunication();
 
