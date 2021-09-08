@@ -4,6 +4,8 @@ using Husty.OpenCvSharp.DepthCamera;
 using VisualServoCore.Vision;
 using VisualServoCore.Controller;
 using VisualServoCore.Communication;
+using System.Linq;
+using System.Collections.Generic;
 
 namespace ConsoleApp
 {
@@ -17,17 +19,15 @@ namespace ConsoleApp
 
             IDepthCamera camera = new Realsense(new(640, 360));
             IVision<BgrXyzMat> cap = new BGRXYZStream(camera);
-            IController<BgrXyzMat> controller = new DepthFusedController();
-
-            ICommunication<string> server = new DummyCommunication();
+            IController<BgrXyzMat, IEnumerable<byte>> controller = new DepthFusedController();
+            ICommunication<IEnumerable<byte>> server = new DummyCommunication();
 
 
             var connector = cap.Connect()
                 .Subscribe(frame =>
                 {
-                    var (speed, steer) = controller.Run(frame);
-                    server.Send($"{speed:f2},{steer:f2}");
-                    Console.WriteLine($"Speed: {speed:f2} km/h, Steer: {steer:f2} rad");
+                    var commands = controller.Run(frame);
+                    server.Send(commands);
                     Cv2.ImShow(" ", frame.BGR);
                     Cv2.WaitKey(1);
                 });

@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace VisualServoCore.Communication
 {
-    public class CAN : ICommunication<byte>
+    public class CAN : ICommunication<IEnumerable<byte>>
     {
 
         // ------ Fields ------ //
@@ -22,7 +22,7 @@ namespace VisualServoCore.Communication
 
         // ------ Methods ------ //
 
-        public bool Send(byte canMsg)
+        public bool Send(IEnumerable<byte> canMsg)
         {
 
             // ---
@@ -30,12 +30,12 @@ namespace VisualServoCore.Communication
             return false;
         }
 
-        public byte Receive()
+        public IEnumerable<byte> Receive()
         {
 
             // ---
 
-            return 0b0;
+            return new byte[] { 0b0 };
         }
 
         public void Dispose()

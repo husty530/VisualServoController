@@ -1,9 +1,9 @@
 ﻿namespace VisualServoCore.Controller
 {
-    public interface IController<TImage>
+    public interface IController<TInput, TOutput>
     {
 
-        public (double Speed, double Steer) Run(TImage input);
+        public TOutput Run(TInput input);
 
     }
 }

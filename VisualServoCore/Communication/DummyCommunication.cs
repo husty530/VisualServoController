@@ -1,11 +1,13 @@
-﻿namespace VisualServoCore.Communication
+﻿using System.Collections.Generic;
+
+namespace VisualServoCore.Communication
 {
-    public class DummyCommunication : ICommunication<string>
+    public class DummyCommunication : ICommunication<IEnumerable<byte>>
     {
 
         // ------ Fields ------ //
 
-        private int _count;
+        private byte _count;
 
 
         // ------ Constructors ------ //
@@ -18,14 +20,15 @@
 
         // ------ Methods ------ //
 
-        public bool Send(string sendmsg)
+        public bool Send(IEnumerable<byte> sendmsg)
         {
             return true;
         }
 
-        public string Receive()
+        public IEnumerable<byte> Receive()
         {
-            return $"dummy [{_count++:d3}]";
+            if (_count > 255) _count = 0;
+            return new byte[] { _count++ };
         }
 
         public void Dispose()

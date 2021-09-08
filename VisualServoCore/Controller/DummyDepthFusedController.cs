@@ -1,10 +1,10 @@
 ﻿using System;
-using OpenCvSharp;
+using System.Collections.Generic;
 using Husty.OpenCvSharp.DepthCamera;
 
 namespace VisualServoCore.Controller
 {
-    public class DummyDepthFusedController : IController<BgrXyzMat>
+    public class DummyDepthFusedController : IController<BgrXyzMat, IEnumerable<byte>>
     {
 
         // ------ Fields ------ //
@@ -22,13 +22,14 @@ namespace VisualServoCore.Controller
 
         // ------ Methods ------ //
 
-        public (double Speed, double Steer) Run(BgrXyzMat input)
+        public IEnumerable<byte> Run(BgrXyzMat input)
         {
             if (input.Empty())
                 throw new ArgumentException("Input image is empty!");
-            var speed = 1.0;
-            var steer = _randomGenerator.NextDouble() - 0.5;
-            return (speed, steer);
+            byte speed = 1;
+            byte steer = (byte)((_randomGenerator.NextDouble() - 0.5) * 100);
+            Console.WriteLine($"Speed: {speed} km/h, Steer: {steer} rad");
+            return new byte[] { speed, steer };
         }
 
     }
