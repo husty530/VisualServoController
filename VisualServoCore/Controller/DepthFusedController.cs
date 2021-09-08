@@ -9,7 +9,7 @@ using Husty.OpenCvSharp.DepthCamera;
 
 namespace VisualServoCore.Controller
 {
-    public class DepthFusedController : IController<BgrXyzMat, IEnumerable<byte>>
+    public class DepthFusedController : IController<BgrXyzMat, LogObject>
     {
 
         // ------ Fields ------ //
@@ -33,13 +33,13 @@ namespace VisualServoCore.Controller
 
         // ------ Methods ------ //
 
-        public IEnumerable<byte> Run(BgrXyzMat input)
+        public LogObject Run(BgrXyzMat input)
         {
 
             var w = input.BGR.Width;
             var h = input.BGR.Height;
-            var centers = _detector.Run(input.BGR)
-                .Where(r => r.Label == "person")
+            var results = _detector.Run(input.BGR);
+            var targets = results.Where(r => r.Label == "person")
                 .Where(r => r.Probability > 0.5)
                 .Select(r =>
                 {
@@ -53,14 +53,15 @@ namespace VisualServoCore.Controller
             byte speed = 0;
             byte steer = 0;
 
-            foreach (var c in centers)
+            foreach (var t in targets)
             {
 
-                Console.WriteLine($"XYZ = {c.X}, {c.Y}, {c.Z}");
+                Console.WriteLine($"XYZ = {t.X}, {t.Y}, {t.Z}");
 
             }
             Console.WriteLine($"Speed: {speed} km/h, Steer: {steer} deg");
-            return new byte[]{ speed, steer };
+
+            return new(DateTimeOffset.Now, speed, steer, results);
         }
 
     }

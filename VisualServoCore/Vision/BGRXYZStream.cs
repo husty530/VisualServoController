@@ -36,7 +36,7 @@ namespace VisualServoCore.Vision
             _cap = device;
             Fps = device.Fps;
             FrameCount = -1;
-            FrameSize = _cap.ColorFrameSize;
+            FrameSize = _cap.FrameSize;
             _isFileSource = false;
         }
 
