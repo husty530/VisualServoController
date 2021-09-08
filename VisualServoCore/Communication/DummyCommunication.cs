@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace VisualServoCore.Communication
 {
@@ -22,6 +23,9 @@ namespace VisualServoCore.Communication
 
         public bool Send(IEnumerable<byte> sendmsg)
         {
+            Console.Write("-->");
+            foreach (var s in sendmsg)
+                Console.WriteLine($"{ s}");
             return true;
         }
 
