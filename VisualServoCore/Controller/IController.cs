@@ -3,7 +3,7 @@
     public interface IController<TInput, TOutput>
     {
 
-        public TOutput Run(TInput input);
+        public LogObject<TOutput> Run(TInput input);
 
     }
 }

@@ -4,10 +4,10 @@ using Husty.OpenCvSharp;
 
 namespace VisualServoCore
 {
-    public record LogObject(
+    public record LogObject<T>(
         DateTimeOffset Time,
-        byte Speed,
-        byte Steer,
+        T Speed,
+        T Steer,
         IEnumerable<YoloResult> Detections
     )
     { }

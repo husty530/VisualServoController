@@ -1,11 +1,13 @@
-﻿namespace VisualServoCore.Communication
+﻿using System.Collections.Generic;
+
+namespace VisualServoCore.Communication
 {
-    public interface ICommunication<TMessage>
+    public interface ICommunication<T>
     {
 
-        public bool Send(TMessage sendmsg);
+        public bool Send(T sendmsg);
 
-        public TMessage Receive();
+        public T Receive();
 
         public void Dispose();
 

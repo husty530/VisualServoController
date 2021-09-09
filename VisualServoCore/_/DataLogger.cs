@@ -6,7 +6,7 @@ using Husty.OpenCvSharp.DepthCamera;
 
 namespace VisualServoCore
 {
-    public class DataLogger : IDisposable
+    public class DataLogger<T> : IDisposable
     {
 
         private readonly string _name;
@@ -22,7 +22,7 @@ namespace VisualServoCore
             Directory.CreateDirectory("log\\" + _name);
         }
 
-        public void Write(LogObject data)
+        public void Write(LogObject<T> data)
         {
             if (_sw == null)
                 _sw = new($"log\\{_name}\\{_name}.txt");

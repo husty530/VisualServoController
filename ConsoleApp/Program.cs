@@ -18,18 +18,19 @@ namespace ConsoleApp
             //IVision<Mat> cap = new DummyBGRStream();
             //IController<Mat> controller = new DummyColorBasedController();
 
-            IDepthCamera camera = new Realsense(new(640, 360));                         // カメラデバイス
-            IVision<BgrXyzMat> cap = new BGRXYZStream(camera);                          // カメラからの映像を流すやつ
-            IController<BgrXyzMat, LogObject> controller = new DepthFusedController();  // 制御器本体
-            ICommunication<IEnumerable<byte>> server = new DummyCommunication();        // 外部と通信するやつ
-            DataLogger log = null;
-            log = new();                                                                // 記録が不要ならコメントアウト
+            //IDepthCamera camera = new Realsense(new(640, 360));                           // カメラデバイス
+
+            IVision<BgrXyzMat> cap = new DummyBGRXYZStream();                               // カメラからの映像を流すやつ
+            IController<BgrXyzMat, double> controller = new DummyDepthFusedController();    // 制御器本体
+            ICommunication<IEnumerable<double>> server = new DummyCommunication();          // 外部と通信するやつ
+            DataLogger<double> log = null;
+            log = new();                                                                    // 記録が不要ならコメントアウト
 
             var connector = cap.Connect()
                 .Subscribe(frame =>
                 {
                     var results = controller.Run(frame);
-                    var command = new byte[] { results.Speed, results.Steer };
+                    var command = new double[] { results.Speed, results.Steer };
                     server.Send(command);
                     Cv2.ImShow(" ", frame.BGR);
                     Cv2.WaitKey(1);
@@ -37,7 +38,7 @@ namespace ConsoleApp
                     log?.Write(frame);
                 });
 
-            Console.ReadKey();                                                          // キーを押すと終了
+            Console.ReadKey();                                                              // キーを押すと終了
             connector.Dispose();
             cap.Disconnect();
             server.Dispose();
