@@ -25,7 +25,7 @@ namespace VisualServoCore
         public void Write(LogObject<T> data)
         {
             if (_sw == null)
-                _sw = new($"log\\{_name}\\{_name}.txt");
+                _sw = new($"log\\{_name}\\{_name}.json");
             _sw.WriteLine(JsonSerializer.Serialize(data));
         }
 
