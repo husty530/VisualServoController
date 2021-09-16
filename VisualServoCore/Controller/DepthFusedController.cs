@@ -44,7 +44,7 @@ namespace VisualServoCore.Controller
                 .Select(r =>
                 {
                     r.DrawBox(input.BGR, new(0, 0, 160), 2);
-                    return r.ScaledCenter(w, h);
+                    return r.Box.Scale(w, h).ToRect().GetCenter();
                 })
                 .Select(r => input.GetPointInfo(r).Vector3);
 
