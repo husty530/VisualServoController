@@ -39,7 +39,7 @@ namespace VisualServoCore.Controller
             var w = input.BGR.Width;
             var h = input.BGR.Height;
             var results = _detector.Run(input.BGR);
-            var targets = results.Where(r => r.Label == "person")
+            var targets = results.Where(r => r.Label is "person")
                 .Where(r => r.Probability > 0.5)
                 .Select(r =>
                 {

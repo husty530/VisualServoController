@@ -12,7 +12,7 @@ namespace VisualServoCore.Vision
         // ------ Fields ------ //
 
         private readonly IDepthCamera _cap;
-        private readonly VideoPlayer _plr;
+        private readonly BgrXyzPlayer _plr;
         private readonly bool _isFileSource;
         private readonly object _lockObj = new();
         private int _posIndex;
@@ -74,19 +74,7 @@ namespace VisualServoCore.Vision
                 {
                     try
                     {
-                        while (true)
-                        {
-                            if (_intenalConnector == null)
-                            {
-                                _intenalConnector = _cap.Connect()
-                                    .Subscribe(imgs =>
-                                    {
-                                        _frame = imgs;
-                                    });
-                            }
-                            if (_frame != null && !_frame.Empty()) break;
-                        }
-                        frame = _frame;
+                        frame = _cap.Read();
                         return true;
                     }
                     catch
@@ -100,7 +88,7 @@ namespace VisualServoCore.Vision
         public IObservable<BgrXyzMat> Connect()
         {
             if (_isFileSource)
-                return _plr?.Start(0).Select(f => f.Frames).Publish().RefCount();
+                return _plr?.Start(0).Select(f => f.Frame).Publish().RefCount();
             else
                 return _cap?.Connect().Publish().RefCount();
         }

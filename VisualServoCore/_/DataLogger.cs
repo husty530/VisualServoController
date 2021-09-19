@@ -11,7 +11,7 @@ namespace VisualServoCore
 
         private readonly string _name;
         private VideoWriter _cwrt;
-        private VideoRecorder _dwrt;
+        private BgrXyzRecorder _dwrt;
         private StreamWriter _sw;
 
         public DataLogger()

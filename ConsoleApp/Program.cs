@@ -18,10 +18,10 @@ namespace ConsoleApp
             //IVision<Mat> cap = new DummyBGRStream();
             //IController<Mat> controller = new DummyColorBasedController();
 
-            //IDepthCamera camera = new Realsense(new(640, 360));                           // カメラデバイス
+            IDepthCamera camera = new Realsense(new(640, 360));                             // カメラデバイス
 
-            IVision<BgrXyzMat> cap = new DummyBGRXYZStream();                               // カメラからの映像を流すやつ
-            IController<BgrXyzMat, double> controller = new DummyDepthFusedController();    // 制御器本体
+            IVision<BgrXyzMat> cap = new BGRXYZStream(camera);                              // カメラからの映像を流すやつ
+            IController<BgrXyzMat, double> controller = new DepthFusedController();         // 制御器本体
             ICommunication<IEnumerable<double>> server = new DummyCommunication();          // 外部と通信するやつ
             DataLogger<double> log = null;
             log = new();                                                                    // 記録が不要ならコメントアウト
@@ -38,7 +38,7 @@ namespace ConsoleApp
                     log?.Write(frame);
                 });
 
-            Console.ReadKey();                                                              // キーを押すと終了
+            while (Console.ReadKey().Key is not ConsoleKey.Enter) ;                         // Enterキーを押すと終了
             connector.Dispose();
             cap.Disconnect();
             server.Dispose();
