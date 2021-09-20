@@ -1,4 +1,4 @@
-﻿using Husty.TcpSocket;
+﻿using Husty.IO;
 
 namespace VisualServoCore.Communication
 {
@@ -7,14 +7,16 @@ namespace VisualServoCore.Communication
 
         // ------ Fields ------ //
 
-        private readonly Server _server;
+        private readonly TcpSocketServer _server;
+        private readonly BidirectionalDataStream _stream;
 
 
         // ------ Constructors ------ //
 
-        public SocketServer(string ip, int port)
+        public SocketServer(int port)
         {
-            _server = new(ip, port);
+            _server = new(port);
+            _stream = _server.GetStream();
         }
 
 
@@ -24,7 +26,7 @@ namespace VisualServoCore.Communication
         {
             try
             {
-                _server.Send(sendmsg);
+                _stream?.WriteString(sendmsg);
                 return true;
             }
             catch
@@ -35,12 +37,13 @@ namespace VisualServoCore.Communication
 
         public string Receive()
         {
-            return _server.Receive<string>();
+            return _stream?.ReadString();
         }
 
         public void Dispose()
         {
-
+            _stream?.Dispose();
+            _server?.Dispose();
         }
 
     }
