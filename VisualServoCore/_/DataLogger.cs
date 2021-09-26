@@ -40,7 +40,7 @@ namespace VisualServoCore
         {
             if (_dwrt == null)
                 _dwrt = new($"log\\{_name}\\{_name}.yms");
-            _dwrt.WriteFrames(frame);
+            _dwrt.WriteFrame(frame);
         }
 
         public void Dispose()
