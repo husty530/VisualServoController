@@ -39,25 +39,25 @@ namespace VisualServoCore.Controller
             var w = input.BGR.Width;
             var h = input.BGR.Height;
             var results = _detector.Run(input.BGR);
-            var targets = results.Where(r => r.Label is "person")
+            var targetBoxes = results.Where(r => r.Label is "person")
                 .Where(r => r.Probability > 0.5)
                 .Select(r =>
                 {
                     r.DrawBox(input.BGR, new(0, 0, 160), 2);
-                    return r.Box.Scale(w, h).ToRect().GetCenter();
+                    return r.Box.Scale(w, h).ToRect();
                 })
-                .Select(r => input.GetPointInfo(r).Vector3);
+                .ToArray();
 
             // generate steering angle from image processing and 3D coordinate information
 
             var speed = 0.0;
             var steer = 0.0;
 
-            foreach (var t in targets)
+            foreach (var box in targetBoxes)
             {
-
-                Console.WriteLine($"XYZ = {t.X}, {t.Y}, {t.Z}");
-
+                var center = box.GetCenter();
+                var xyz = input.GetPointInfo(center);
+                Console.WriteLine($"XYZ = {xyz.X}, {xyz.Y}, {xyz.Z}");
             }
             Console.WriteLine($"Speed: {speed} km/h, Steer: {steer} deg");
 
