@@ -6,7 +6,7 @@ using static Lawicel.CANUSB;
 
 namespace VisualServoCore.Communication
 {
-    public class EvSteerViaCan : ICommunication<short>
+    public class CanHandlerForEv : ICommunication<short>
     {
 
         // ------ Fields ------ //
@@ -19,7 +19,7 @@ namespace VisualServoCore.Communication
 
         // ------ Constructors ------ //
 
-        public EvSteerViaCan()
+        public CanHandlerForEv()
         {
             canusb_getFirstAdapter(new StringBuilder(32), 32);
             //
