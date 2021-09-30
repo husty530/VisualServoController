@@ -13,4 +13,10 @@
     <PackageReference Include="System.Reactive" Version="5.0.0" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Reference Include="canusbdrv64_net">
+      <HintPath>Communication\canusbdrv64_net.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
 </Project>
