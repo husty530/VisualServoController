@@ -8,7 +8,7 @@ using Husty.OpenCvSharp;
 
 namespace VisualServoCore.Controller
 {
-    public class ColorBasedController : IController<Mat, double>
+    public class ColorBasedController : IController<Mat, short>
     {
 
         // ------ Fields ------ //
@@ -39,7 +39,7 @@ namespace VisualServoCore.Controller
 
         // ------ Methods ------ //
 
-        public LogObject<double> Run(Mat input)
+        public LogObject<short> Run(Mat input)
         {
             if (input.Empty())
                 throw new ArgumentException("Input image is empty!");
@@ -54,12 +54,11 @@ namespace VisualServoCore.Controller
             //    .Select(r => r.ScaledCenter(w, h))                                              // 矩形中心点を列挙して
             //    .Select(c => _transformer.ConvertToWorldCoordinate(new((int)c.X, (int)c.Y)));   // 画像座標→実空間座標に
 
-            var speed = 1.0;
-            var steer = 0.0;
+            var steer = 0;
 
-            Console.WriteLine($"Speed: {speed:f2} km/h, Steer: {steer:f2} deg");
+            Console.WriteLine($"Steer: {steer:f2} deg");
 
-            return new(DateTimeOffset.Now, speed, steer, results);
+            return new(DateTimeOffset.Now, (short)steer, results);
         }
 
     }

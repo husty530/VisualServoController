@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace VisualServoCore.Communication
 {
-    public class DummyCommunication : ICommunication<IEnumerable<double>>
+    public class DummyCommunication : ICommunication<short>
     {
 
         // ------ Fields ------ //
@@ -21,18 +21,17 @@ namespace VisualServoCore.Communication
 
         // ------ Methods ------ //
 
-        public bool Send(IEnumerable<double> sendmsg)
+        public bool Send(short sendmsg)
         {
             Console.Write("-->");
-            foreach (var s in sendmsg)
-                Console.WriteLine($"{ s}");
+            Console.WriteLine($"{sendmsg}");
             return true;
         }
 
-        public IEnumerable<double> Receive()
+        public short Receive()
         {
             if (_count > 255) _count = 0;
-            return new double[] { _count++ };
+            return _count++;
         }
 
         public void Dispose()

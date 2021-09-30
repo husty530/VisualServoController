@@ -21,17 +21,16 @@ namespace ConsoleApp
             IDepthCamera camera = new Realsense(new(640, 360));                             // カメラデバイス
 
             IVision<BgrXyzMat> cap = new BGRXYZStream(camera);                              // カメラからの映像を流すやつ
-            IController<BgrXyzMat, double> controller = new DepthFusedController();         // 制御器本体
-            ICommunication<IEnumerable<double>> server = new DummyCommunication();          // 外部と通信するやつ
-            DataLogger<double> log = null;
+            IController<BgrXyzMat, short> controller = new DepthFusedController();          // 制御器本体
+            ICommunication<short> server = new DummyCommunication();                        // 外部と通信するやつ
+            DataLogger<short> log = null;
             log = new();                                                                    // 記録が不要ならコメントアウト
 
             var connector = cap.Connect()
                 .Subscribe(frame =>
                 {
                     var results = controller.Run(frame);
-                    var command = new double[] { results.Speed, results.Steer };
-                    server.Send(command);
+                    server.Send(results.Steer);
                     Cv2.ImShow(" ", frame.BGR);
                     Cv2.WaitKey(1);
                     log?.Write(results);

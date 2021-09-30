@@ -11,7 +11,7 @@ namespace VisualServoCore.Communication
 
         // ------ Fields ------ //
 
-        //Tire-Angle Order (int16, LSB=0.1deg)
+        // Tire-Angle Order (int16, LSB=0.1deg)
         private const uint _sendSteerId = 0x0000062F;       
         private const uint _recvSteerId = 0x0000072F;
         private readonly uint _handle;

@@ -9,7 +9,7 @@ using Husty.OpenCvSharp.DepthCamera;
 
 namespace VisualServoCore.Controller
 {
-    public class DepthFusedController : IController<BgrXyzMat, double>
+    public class DepthFusedController : IController<BgrXyzMat, short>
     {
 
         // ------ Fields ------ //
@@ -33,7 +33,7 @@ namespace VisualServoCore.Controller
 
         // ------ Methods ------ //
 
-        public LogObject<double> Run(BgrXyzMat input)
+        public LogObject<short> Run(BgrXyzMat input)
         {
 
             var w = input.BGR.Width;
@@ -50,8 +50,7 @@ namespace VisualServoCore.Controller
 
             // generate steering angle from image processing and 3D coordinate information
 
-            var speed = 0.0;
-            var steer = 0.0;
+            var steer = 0;
 
             foreach (var box in targetBoxes)
             {
@@ -59,9 +58,9 @@ namespace VisualServoCore.Controller
                 var xyz = input.GetPointInfo(center);
                 Console.WriteLine($"XYZ = {xyz.X}, {xyz.Y}, {xyz.Z}");
             }
-            Console.WriteLine($"Speed: {speed} km/h, Steer: {steer} deg");
+            Console.WriteLine($"Steer: {steer} deg");
 
-            return new(DateTimeOffset.Now, speed, steer, results);
+            return new(DateTimeOffset.Now, (short)steer, results);
         }
 
     }
