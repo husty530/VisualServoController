@@ -58,7 +58,7 @@ namespace VisualServoCore.Controller
 
             Console.WriteLine($"Steer: {steer:f2} deg");
 
-            return new(DateTimeOffset.Now, (short)steer, results);
+            return new(DateTimeOffset.Now, (short)steer);
         }
 
     }

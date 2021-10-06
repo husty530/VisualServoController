@@ -14,11 +14,19 @@ namespace VisualServoCore.Controller
 
         // ------ Fields ------ //
 
+        private readonly double _gain;
+        private readonly int _maxWidth;
+        private readonly int _maxDistance;
         private readonly YoloDetector _detector;
+        private readonly object _locker = new();
+        private readonly Radar _radar;
+        private Point2f[] _points;
+        private Point2f _targetPoint;
+
 
         // ------ Constructors ------ //
 
-        public DepthFusedController()
+        public DepthFusedController(double gain, int maxWidth, int maxDistance)
         {
 
             // initialize detector instance and some parameters
@@ -27,19 +35,39 @@ namespace VisualServoCore.Controller
             var weights = "..\\..\\..\\..\\..\\model\\_.weights";
             var names = "..\\..\\..\\..\\..\\model\\_.names";
             _detector = new(cfg, weights, names, new(512, 288), 0.5f);
+            _gain = gain;                       // for steering
+            _maxWidth = maxWidth;               // maximum number of X-axis
+            _maxDistance = maxDistance;         // maximum number of Z-axis
+            _radar = new(maxWidth, maxDistance);
 
         }
 
 
-        // ------ Methods ------ //
+        // ------ Public Methods ------ //
 
         public LogObject<short> Run(BgrXyzMat input)
         {
+            var boxes = FindBoxes(input);
+            _points = boxes.Select(r => r.GetCenter().ToPoint2f()).ToArray();
+            _targetPoint = SelectTarget(input, boxes);
+            var steer = CalculateSteer(_targetPoint.ToPoint());
+            return new(DateTimeOffset.Now, (short)steer);
+        }
 
+        public Mat GetGroundCoordinateResults()
+        {
+            return _radar.GetRadar(_locker, _points, _targetPoint);
+        }
+
+
+        // ------ Private Methods ------ //
+
+        private Rect[] FindBoxes(BgrXyzMat input)
+        {
             var w = input.BGR.Width;
             var h = input.BGR.Height;
             var results = _detector.Run(input.BGR);
-            var targetBoxes = results.Where(r => r.Label is "person")
+            var boxes = results.Where(r => r.Label is "person")
                 .Where(r => r.Probability > 0.5)
                 .Select(r =>
                 {
@@ -47,20 +75,20 @@ namespace VisualServoCore.Controller
                     return r.Box.Scale(w, h).ToRect();
                 })
                 .ToArray();
+            return boxes;
+        }
 
-            // generate steering angle from image processing and 3D coordinate information
+        private Point SelectTarget(BgrXyzMat input, Rect[] boxes)
+        {
+            var center = boxes[0].GetCenter();
+            var xyz = input.GetPointInfo(center);
+            var target = new Point(xyz.X, xyz.Z);
+            return target;
+        }
 
-            var steer = 0;
-
-            foreach (var box in targetBoxes)
-            {
-                var center = box.GetCenter();
-                var xyz = input.GetPointInfo(center);
-                Console.WriteLine($"XYZ = {xyz.X}, {xyz.Y}, {xyz.Z}");
-            }
-            Console.WriteLine($"Steer: {steer} deg");
-
-            return new(DateTimeOffset.Now, (short)steer, results);
+        private double CalculateSteer(Point point)
+        {
+            return 0;
         }
 
     }

@@ -1,11 +1,13 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.31613.86
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31717.71
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ConsoleApp", "ConsoleApp\ConsoleApp.csproj", "{0FE44AAA-1D9E-4573-950D-1537B43A84FD}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "VisualServoCore", "VisualServoCore\VisualServoCore.csproj", "{BA94A1B5-5483-41E6-A0A0-6D1A6C80E202}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WpfApp", "WpfApp\WpfApp.csproj", "{EF8E0580-8A8E-4EE1-9A04-B46C8C9FBB8F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -31,6 +33,14 @@ Global
 		{BA94A1B5-5483-41E6-A0A0-6D1A6C80E202}.Release|Any CPU.Build.0 = Release|Any CPU
 		{BA94A1B5-5483-41E6-A0A0-6D1A6C80E202}.Release|x64.ActiveCfg = Release|x64
 		{BA94A1B5-5483-41E6-A0A0-6D1A6C80E202}.Release|x64.Build.0 = Release|x64
+		{EF8E0580-8A8E-4EE1-9A04-B46C8C9FBB8F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EF8E0580-8A8E-4EE1-9A04-B46C8C9FBB8F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EF8E0580-8A8E-4EE1-9A04-B46C8C9FBB8F}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{EF8E0580-8A8E-4EE1-9A04-B46C8C9FBB8F}.Debug|x64.Build.0 = Debug|Any CPU
+		{EF8E0580-8A8E-4EE1-9A04-B46C8C9FBB8F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EF8E0580-8A8E-4EE1-9A04-B46C8C9FBB8F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EF8E0580-8A8E-4EE1-9A04-B46C8C9FBB8F}.Release|x64.ActiveCfg = Release|Any CPU
+		{EF8E0580-8A8E-4EE1-9A04-B46C8C9FBB8F}.Release|x64.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

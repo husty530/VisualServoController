@@ -33,7 +33,7 @@ namespace VisualServoCore.Controller
             var steer = (_randomGenerator.NextDouble() - 0.5) * 100;
             Console.WriteLine($"Steer: {steer} rad");
 
-            return new(DateTimeOffset.Now, (short)steer, results);
+            return new(DateTimeOffset.Now, (short)steer);
         }
 
     }

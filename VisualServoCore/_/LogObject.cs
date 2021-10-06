@@ -6,8 +6,6 @@ namespace VisualServoCore
 {
     public record LogObject<T>(
         DateTimeOffset Time,
-        T Steer,
-        IEnumerable<YoloResult> Detections
-    )
-    { }
+        T Steer
+    );
 }

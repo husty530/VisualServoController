@@ -18,13 +18,17 @@ namespace ConsoleApp
             //IVision<Mat> cap = new DummyBGRStream();
             //IController<Mat> controller = new DummyColorBasedController();
 
-            IDepthCamera camera = new Realsense(new(640, 360));                             // カメラデバイス
+            var gain = 1.0;
+            var maxWidth = 3000;
+            var maxDistance = 8000;
 
-            IVision<BgrXyzMat> cap = new BGRXYZStream(camera);                              // カメラからの映像を流すやつ
-            IController<BgrXyzMat, short> controller = new DepthFusedController();          // 制御器本体
-            ICommunication<short> server = new DummyCommunication();                        // 外部と通信するやつ
+            IDepthCamera camera = new Realsense(new(640, 360));                                                 // カメラデバイス
+
+            IVision<BgrXyzMat> cap = new BGRXYZStream(camera);                                                  // カメラからの映像を流すやつ
+            IController<BgrXyzMat, short> controller = new DepthFusedController(gain, maxWidth, maxDistance);   // 制御器本体
+            ICommunication<short> server = new DummyCommunication();                                            // 外部と通信するやつ
             DataLogger<short> log = null;
-            log = new();                                                                    // 記録が不要ならコメントアウト
+            log = new();                                                                                        // 記録が不要ならコメントアウト
 
             var connector = cap.Connect()
                 .Subscribe(frame =>

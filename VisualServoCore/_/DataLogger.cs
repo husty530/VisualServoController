@@ -24,21 +24,21 @@ namespace VisualServoCore
 
         public void Write(LogObject<T> data)
         {
-            if (_sw == null)
+            if (_sw is null)
                 _sw = new($"log\\{_name}\\{_name}.json");
             _sw.WriteLine(JsonSerializer.Serialize(data));
         }
 
         public void Write(Mat frame)
         {
-            if (_cwrt == null)
+            if (_cwrt is null)
                 _cwrt = new($"log\\{_name}\\{_name}.mp4", FourCC.MPG4, 15, new(frame.Width, frame.Height));
             _cwrt.Write(frame);
         }
 
         public void Write(BgrXyzMat frame)
         {
-            if (_dwrt == null)
+            if (_dwrt is null)
                 _dwrt = new($"log\\{_name}\\{_name}.yms");
             _dwrt.WriteFrame(frame);
         }
