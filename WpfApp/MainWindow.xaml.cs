@@ -12,7 +12,7 @@ using VisualServoCore;
 using VisualServoCore.Vision;
 using VisualServoCore.Communication;
 using VisualServoCore.Controller;
-using Husty.OpenCvSharp.DepthCamera;
+using Husty.OpenCvSharp;
 
 namespace WpfApp
 {
@@ -25,19 +25,19 @@ namespace WpfApp
 
         // Primary processes
         private IDisposable _stream;
-        private CanHandlerForEv _server;
-        private Realsense _depthCamera;
-        private DepthFusedController _controller;
-        private BGRXYZStream _video;
-        private DataLogger<short> _log;
+        private DummyCommunication _server;
+        private ColorBasedController _controller;
+        private BGRStream _video;
+        private DataLogger<double> _log;
 
         // Temporary datas and flags
         private string _initDir;
         private int _visionSelectedIndex;
         private bool _logOn;
         private bool _recOn;
-        private short _steer;
+        private double _steer;
         private double _gain;
+        private int _focusWidth;
         private int _maxWidth;
         private int _maxDistance;
 
@@ -53,6 +53,7 @@ namespace WpfApp
                 _visionSelectedIndex = int.Parse(sr.ReadLine());
                 _logOn = sr.ReadLine() is "LogOn" ? true : false;
                 _recOn = sr.ReadLine() is "RecOn" ? true : false;
+                _focusWidth = int.Parse(sr.ReadLine());
                 _maxWidth = int.Parse(sr.ReadLine());
                 _maxDistance = int.Parse(sr.ReadLine());
             }
@@ -61,6 +62,7 @@ namespace WpfApp
                 _initDir = "C:";
                 _visionSelectedIndex = 0;
                 _gain = 1.0;
+                _focusWidth = 1500;
                 _maxWidth = 3000;
                 _maxDistance = 8000;
             }
@@ -68,10 +70,12 @@ namespace WpfApp
             LogCheck.IsChecked = _logOn;
             RecCheck.IsChecked = _recOn;
             GainText.Text = _gain.ToString();
+            FocusWidthText.Text = _focusWidth.ToString();
             MaxWidthText.Text = _maxWidth.ToString();
             MaxDistanceText.Text = _maxDistance.ToString();
             if (!(bool)LogCheck.IsChecked)
                 RecCheck.IsEnabled = false;
+
             Closed += (sender, args) =>
             {
                 GC.Collect();
@@ -93,7 +97,7 @@ namespace WpfApp
                 VehicleButton.IsEnabled = false;
                 Task.Run(() =>
                 {
-                    _server = new CanHandlerForEv();
+                    _server = new();
                     Dispatcher.Invoke(() =>
                     {
                         VehicleButton.IsEnabled = true;
@@ -131,12 +135,16 @@ namespace WpfApp
                 try
                 {
                     var gain = double.Parse(GainText.Text);
+                    var focusWidth = int.Parse(FocusWidthText.Text);
                     var maxDistance = int.Parse(MaxDistanceText.Text);
                     var maxWidth = int.Parse(MaxWidthText.Text);
                     if (gain < 0) throw new();
                     if (maxDistance <= 0) throw new();
                     if (maxWidth <= 0) throw new();
+                    if (focusWidth <= 0) throw new();
+                    if (focusWidth > maxWidth) throw new();
                     _gain = gain;
+                    _focusWidth = focusWidth;
                     _maxDistance = maxDistance;
                     _maxWidth = maxWidth;
                     _logOn = (bool)LogCheck.IsChecked;
@@ -148,7 +156,7 @@ namespace WpfApp
                 {
                     return;
                 }
-                _controller = new DepthFusedController(_gain, _maxWidth, _maxDistance);
+                _controller = new(_gain, _maxWidth, _maxDistance, _focusWidth);
                 switch (SourceCombo.SelectedIndex)
                 {
                     case 0:
@@ -171,15 +179,14 @@ namespace WpfApp
                                     _steer = obj.Steer;
                                     _log?.Write(obj);
                                     if (_recOn) _log?.Write(frame);
-                                    ProcessUserThread(view.BGR, radar);
+                                    ProcessUserThread(view, radar);
                                 });
                             VisionButton.Background = Brushes.Red;
                         }
                         cofd.Dispose();
                         break;
                     case 1:
-                        _depthCamera = new(new(640, 360));
-                        _video = new(_depthCamera);
+                        _video = new(0);
                         _stream = _video.Connect()
                             .Subscribe(frame =>
                             {
@@ -189,7 +196,7 @@ namespace WpfApp
                                 _steer = obj.Steer;
                                 _log?.Write(obj);
                                 if (_recOn) _log?.Write(frame);
-                                ProcessUserThread(view.BGR, radar);
+                                ProcessUserThread(view, radar);
                             });
                         VisionButton.Background = Brushes.Red;
                         break;
@@ -201,7 +208,6 @@ namespace WpfApp
                 _stream?.Dispose();
                 _video?.Disconnect();
                 _video = null;
-                _depthCamera?.Disconnect();
                 VisionButton.Background = Brushes.CornflowerBlue;
                 GC.Collect();
             }

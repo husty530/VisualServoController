@@ -69,6 +69,8 @@
             <StackPanel Width="600" HorizontalAlignment="Left" Orientation="Horizontal">
                 <Label Content="Gain: " Foreground="White"/>
                 <TextBox x:Name="GainText" Foreground="White" Width="50"/>
+                <Label Content="FocusWidth: " Foreground="White"/>
+                <TextBox x:Name="FocusWidthText" Foreground="White" Width="50"/>
                 <Label Content="MaxWidth: " Foreground="White"/>
                 <TextBox x:Name="MaxWidthText" Foreground="White" Width="50"/>
                 <Label Content="MaxDistance: " Foreground="White"/>

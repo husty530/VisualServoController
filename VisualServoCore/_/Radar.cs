@@ -18,7 +18,7 @@ namespace VisualServoCore
 
         // ------ Constructors ------ //
 
-        public Radar(int maxWidth, int maxDistance)
+        internal Radar(int maxWidth, int maxDistance, int? focusWidth = null)
         {
             _maxWidth = maxWidth;
             _maxDistance = maxDistance;
@@ -31,21 +31,26 @@ namespace VisualServoCore
             Circle(_radarCanvas, new Point(w2, h), 4000, _blue, 14);
             Circle(_radarCanvas, new Point(w2, h), 5000, _blue, 14);
             Circle(_radarCanvas, new Point(w2, h), 6000, _blue, 14);
+            if (focusWidth is not null)
+            {
+                var left = maxWidth - (int)focusWidth;
+                var right = maxWidth + (int)focusWidth;
+                Line(_radarCanvas, new Point(left, 0), new Point(left, h), _green, 10);
+                Line(_radarCanvas, new Point(right, 0), new Point(right, h), _green, 10);
+            }
         }
 
 
         // ------ Methods ------ //
 
-        internal Mat GetRadar(object locker, Point2f[] points, Point2f? targetPoint = null)
+        internal Mat GetRadar(Point2f[] points, Point2f? targetPoint = null)
         {
             var radar = _radarCanvas.Clone();
-            lock (locker)
-            {
-                foreach (var p in points)
-                    Circle(radar, GetRadarCoordinate(p), 100, _green, FILLED);
-                if (targetPoint is not null)
-                    Line(radar, new Point(radar.Width / 2, radar.Height), GetRadarCoordinate((Point2f)targetPoint), new(180, 180, 180), 14);
-            }
+            foreach (var p in points)
+                Circle(radar, GetRadarCoordinate(p), 100, _green, FILLED);
+            if (targetPoint is not null)
+                Line(radar, new Point(radar.Width / 2, radar.Height), GetRadarCoordinate((Point2f)targetPoint), new(180, 180, 180), 14);
+            
             return radar;
         }
 

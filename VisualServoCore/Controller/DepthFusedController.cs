@@ -18,7 +18,6 @@ namespace VisualServoCore.Controller
         private readonly int _maxWidth;
         private readonly int _maxDistance;
         private readonly YoloDetector _detector;
-        private readonly object _locker = new();
         private readonly Radar _radar;
         private Point2f[] _points;
         private Point2f _targetPoint;
@@ -56,7 +55,7 @@ namespace VisualServoCore.Controller
 
         public Mat GetGroundCoordinateResults()
         {
-            return _radar.GetRadar(_locker, _points, _targetPoint);
+            return _radar.GetRadar(_points, _targetPoint);
         }
 
 

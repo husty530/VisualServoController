@@ -4,7 +4,7 @@ using Husty.OpenCvSharp;
 
 namespace VisualServoCore.Controller
 {
-    public class DummyColorBasedController : IController<Mat, short>
+    public class DummyColorBasedController : IController<Mat, double>
     {
 
         // ------ Fields ------ //
@@ -20,22 +20,21 @@ namespace VisualServoCore.Controller
             var cfg = "..\\..\\..\\..\\..\\model\\_.cfg";
             var weights = "..\\..\\..\\..\\..\\model\\_.weights";
             var names = "..\\..\\..\\..\\..\\model\\_.names";
-            _detector = new(cfg, weights, names, new(512, 288), 0.5f);
+            _detector = new(cfg, weights, names, new(640, 480), 0.5f);
         }
 
 
         // ------ Methods ------ //
 
-        public LogObject<short> Run(Mat input)
+        public LogObject<double> Run(Mat input)
         {
             if (input.Empty())
                 throw new ArgumentException("Input image is empty!");
             var results = _detector.Run(input);
-            var speed = 1.0;
             var steer = (_randomGenerator.NextDouble() - 0.5) * 100;
             Console.WriteLine($"Steer: {steer:f2} deg");
 
-            return new(DateTimeOffset.Now, (short)steer);
+            return new(DateTimeOffset.Now, steer);
         }
 
     }

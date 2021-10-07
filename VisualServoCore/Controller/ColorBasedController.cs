@@ -8,57 +8,76 @@ using Husty.OpenCvSharp;
 
 namespace VisualServoCore.Controller
 {
-    public class ColorBasedController : IController<Mat, short>
+    public class ColorBasedController : IController<Mat, double>
     {
 
         // ------ Fields ------ //
 
+        private readonly Size _size = new(640, 480);
         private readonly IntrinsicCameraParameters _paramIn;
         private readonly ExtrinsicCameraParameters _paramEx;
         private readonly PerspectiveTransformer _transformer;
         private readonly YoloDetector _detector;
+        private readonly double _gain;
+        private readonly int _maxWidth;
+        private readonly int _maxDistance;
+        private readonly int _focusWidth;
+        private readonly Radar _radar;
+        private Point2f[] _points;
 
 
         // ------ Constructors ------ //
 
-        public ColorBasedController()
+        public ColorBasedController(double gain, int maxWidth, int maxDistance, int focusWidth)
         {
+            _paramIn = IntrinsicCameraParameters.Load("");
+            _paramEx = ExtrinsicCameraParameters.Load("");
+            _transformer = new(_paramIn.CameraMatrix, _paramEx);
 
-            // Initialize YOLO
             var cfg = "..\\..\\..\\..\\..\\model\\_.cfg";
             var weights = "..\\..\\..\\..\\..\\model\\_.weights";
             var names = "..\\..\\..\\..\\..\\model\\_.names";
-            _detector = new(cfg, weights, names, new(512, 288), 0.5f);
+            _detector = new(cfg, weights, names, _size, 0.5f);
 
-            // Load camera parameters
-            //_paramIn = IntrinsicCameraParameters.Load("..\\..\\..\\intrinsic.txt");
-            //_paramEx = ExtrinsicCameraParameters.Load("..\\..\\..\\extrinsic.txt");
-            //_transformer = new(_paramIn.CameraMatrix, _paramEx);
+            _gain = gain;                       // for steering
+            _maxWidth = maxWidth;               // maximum number of X-axis
+            _maxDistance = maxDistance;         // maximum number of Z-axis
+            _focusWidth = focusWidth;
+            _radar = new(maxWidth, maxDistance, focusWidth);
         }
 
 
-        // ------ Methods ------ //
+        // ------ Public Methods ------ //
 
-        public LogObject<short> Run(Mat input)
+        public LogObject<double> Run(Mat input)
         {
-            if (input.Empty())
-                throw new ArgumentException("Input image is empty!");
+            Cv2.Resize(input, input, _size);
+            input = input.Undistort(_paramIn.CameraMatrix, _paramIn.DistortionCoeffs);
+            _points = GetPoints(input);
+            var steer = CalculateSteer();
+            return new(DateTimeOffset.Now, steer);
+        }
 
+        public Mat GetGroundCoordinateResults()
+        {
+            return _radar.GetRadar(_points, null);
+        }
+
+        // ------ Private Methods ------ //
+
+        private Point2f[] GetPoints(Mat input)
+        {
             var w = input.Width;
             var h = input.Height;
-            //input = input.Undistort(_paramIn.CameraMatrix, _paramIn.DistortionCoeffs);          // 歪み補正
+            return _detector.Run(input)
+                .Select(r => r.Box.Scale(w, h).ToRect().GetCenter())
+                .Select(c => _transformer.ConvertToWorldCoordinate(new((int)c.X, (int)c.Y)))
+                .ToArray();
+        }
 
-            var results = _detector.Run(input);                                                 // YOLO
-
-            //var points = results
-            //    .Select(r => r.ScaledCenter(w, h))                                              // 矩形中心点を列挙して
-            //    .Select(c => _transformer.ConvertToWorldCoordinate(new((int)c.X, (int)c.Y)));   // 画像座標→実空間座標に
-
-            var steer = 0;
-
-            Console.WriteLine($"Steer: {steer:f2} deg");
-
-            return new(DateTimeOffset.Now, (short)steer);
+        private double CalculateSteer()
+        {
+            return 0;
         }
 
     }
