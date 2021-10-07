@@ -31,25 +31,26 @@ namespace VisualServoCore
             Circle(_radarCanvas, new Point(w2, h), 4000, _blue, 14);
             Circle(_radarCanvas, new Point(w2, h), 5000, _blue, 14);
             Circle(_radarCanvas, new Point(w2, h), 6000, _blue, 14);
+            Circle(_radarCanvas, new Point(w2, h), 7000, _blue, 14);
         }
 
 
         // ------ Methods ------ //
 
-        internal Mat GetRadar(object locker, Point2f[] points, Point2f? targetPoint = null)
+        internal Mat GetRadar(object locker, Point[] points, Point? targetPoint = null)
         {
             var radar = _radarCanvas.Clone();
             lock (locker)
             {
                 foreach (var p in points)
-                    Circle(radar, GetRadarCoordinate(p), 100, _green, FILLED);
-                if (targetPoint is not null)
-                    Line(radar, new Point(radar.Width / 2, radar.Height), GetRadarCoordinate((Point2f)targetPoint), new(180, 180, 180), 14);
+                    Circle(radar, GetRadarCoordinate(p), 140, _red, FILLED);
+                if (targetPoint is Point target)
+                    Line(radar, new Point(radar.Width / 2, radar.Height), GetRadarCoordinate(target), new(180, 180, 180), 14);
             }
             return radar;
         }
 
-        private Point GetRadarCoordinate(Point2f p) =>
+        private Point GetRadarCoordinate(Point p) =>
             new Point(p.X + _maxWidth, _maxDistance - p.Y);
 
     }

@@ -28,7 +28,7 @@ namespace ConsoleApp
             IController<BgrXyzMat, short> controller = new DepthFusedController(gain, maxWidth, maxDistance);   // 制御器本体
             ICommunication<short> server = new DummyCommunication();                                            // 外部と通信するやつ
             DataLogger<short> log = null;
-            log = new();                                                                                        // 記録が不要ならコメントアウト
+            log = new(new(640, 360));                                                                                        // 記録が不要ならコメントアウト
 
             var connector = cap.Connect()
                 .Subscribe(frame =>

@@ -44,14 +44,14 @@
 
         <Viewbox Grid.Row="0" Grid.Column="1" Grid.ColumnSpan="2" Margin="5">
             <ComboBox x:Name="CommunicationCombo" Width="180" Background="DarkGray">
-                <ComboBoxItem Content="Communication:TcpSocket" IsSelected ="True"/>
-                <ComboBoxItem Content="Communication:CAN"/>
+                <ComboBoxItem Content="Communication:TcpSocket"/>
+                <ComboBoxItem Content="Communication:CAN" IsSelected="True"/>
             </ComboBox>
         </Viewbox>
         <Viewbox Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="2" Margin="5">
             <ComboBox x:Name="SourceCombo" Width="180" Background="DarkGray">
-                <ComboBoxItem Content="Source:VideoFile" IsSelected ="True"/>
-                <ComboBoxItem Content="Source:Camera"/>
+                <ComboBoxItem Content="Source:VideoFile"/>
+                <ComboBoxItem Content="Source:Camera" IsSelected="True"/>
             </ComboBox>
         </Viewbox>
 

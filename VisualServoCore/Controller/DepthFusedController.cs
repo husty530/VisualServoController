@@ -20,8 +20,8 @@ namespace VisualServoCore.Controller
         private readonly YoloDetector _detector;
         private readonly object _locker = new();
         private readonly Radar _radar;
-        private Point2f[] _points;
-        private Point2f _targetPoint;
+        private Point[] _points;
+        private Point? _targetPoint;
 
 
         // ------ Constructors ------ //
@@ -47,11 +47,14 @@ namespace VisualServoCore.Controller
 
         public LogObject<short> Run(BgrXyzMat input)
         {
-            var boxes = FindBoxes(input);
-            _points = boxes.Select(r => r.GetCenter().ToPoint2f()).ToArray();
-            _targetPoint = SelectTarget(input, boxes);
-            var steer = CalculateSteer(_targetPoint.ToPoint());
-            return new(DateTimeOffset.Now, (short)steer);
+            _points = FindBoxes(input).Select(r => GetXZ(input, r)).Where(xz => xz is not null).Select(xz => (Point)xz).ToArray();
+            _targetPoint = SelectTarget(input, _points) ?? null;
+            if (_targetPoint is Point target)
+            {
+                var steer = CalculateSteer(target);
+                return new(DateTimeOffset.Now, (short)steer);
+            }
+            return new(DateTimeOffset.Now, 0);
         }
 
         public Mat GetGroundCoordinateResults()
@@ -78,11 +81,40 @@ namespace VisualServoCore.Controller
             return boxes;
         }
 
-        private Point SelectTarget(BgrXyzMat input, Rect[] boxes)
+        private Point? GetXZ(BgrXyzMat input, Rect box)
         {
-            var center = boxes[0].GetCenter();
-            var xyz = input.GetPointInfo(center);
-            var target = new Point(xyz.X, xyz.Z);
+            try
+            {
+                var targetX = 0;
+                var targetZ = 0;
+                var count = 0;
+                var center = box.GetCenter();
+                for (int y = center.Y - 2; y < center.Y + 2; y++)
+                {
+                    for (int x = center.X - 2; x < center.X + 2; x++)
+                    {
+                        var xyz = input.GetPointInfo(new(x, y));
+                        if (xyz.Z is not 0)
+                        {
+                            targetX += (int)xyz.X;
+                            targetZ += (int)xyz.Z;
+                            count++;
+                        }
+                    }
+                }
+                if (count is 0) throw new Exception();
+                return new(targetX / count, targetZ / count);
+            }
+            catch
+            {
+                return null;
+            }
+        }
+
+        private Point? SelectTarget(BgrXyzMat input, Point[] points)
+        {
+            if (points.Length is 0) return null;
+            var target = points[0];
             return target;
         }
 

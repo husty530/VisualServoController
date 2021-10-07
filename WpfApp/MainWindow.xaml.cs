@@ -40,6 +40,7 @@ namespace WpfApp
         private double _gain;
         private int _maxWidth;
         private int _maxDistance;
+        private readonly OpenCvSharp.Size _size = new(640, 360);
 
         public MainWindow()
         {
@@ -140,8 +141,8 @@ namespace WpfApp
                     _maxDistance = maxDistance;
                     _maxWidth = maxWidth;
                     _logOn = (bool)LogCheck.IsChecked;
-                    _log = _logOn ? new() : null;
                     _recOn = (bool)RecCheck.IsChecked;
+                    _log = _logOn ? new(_recOn ? _size : null) : null;
                     _visionSelectedIndex = SourceCombo.SelectedIndex;
                 }
                 catch
@@ -166,11 +167,11 @@ namespace WpfApp
                                 .Subscribe(frame =>
                                 {
                                     var view = frame.Clone();
+                                    if (_recOn) _log?.Write(frame);
                                     var obj = _controller.Run(view);
                                     var radar = _controller.GetGroundCoordinateResults();
                                     _steer = obj.Steer;
                                     _log?.Write(obj);
-                                    if (_recOn) _log?.Write(frame);
                                     ProcessUserThread(view.BGR, radar);
                                 });
                             VisionButton.Background = Brushes.Red;
@@ -178,17 +179,17 @@ namespace WpfApp
                         cofd.Dispose();
                         break;
                     case 1:
-                        _depthCamera = new(new(640, 360));
+                        _depthCamera = new(_size);
                         _video = new(_depthCamera);
                         _stream = _video.Connect()
                             .Subscribe(frame =>
                             {
                                 var view = frame.Clone();
+                                if (_recOn) _log?.Write(frame);
                                 var obj = _controller.Run(view);
                                 var radar = _controller.GetGroundCoordinateResults();
                                 _steer = obj.Steer;
                                 _log?.Write(obj);
-                                if (_recOn) _log?.Write(frame);
                                 ProcessUserThread(view.BGR, radar);
                             });
                         VisionButton.Background = Brushes.Red;
@@ -236,5 +237,6 @@ namespace WpfApp
         {
             LogCheck.IsEnabled = true;
         }
+
     }
 }
