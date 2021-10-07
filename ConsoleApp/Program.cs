@@ -22,7 +22,7 @@ namespace ConsoleApp
             ColorBasedController controller = new(gain, maxWidth, maxDistance, focusWidth);
             DummyCommunication server = new();
             DataLogger<double> log = null;
-            log = new();
+            log = new(new(1280, 960));
 
             var connector = cap.Connect()
                 .Subscribe(frame =>

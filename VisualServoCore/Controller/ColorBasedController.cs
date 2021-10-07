@@ -52,7 +52,7 @@ namespace VisualServoCore.Controller
         public LogObject<double> Run(Mat input)
         {
             Cv2.Resize(input, input, _size);
-            input = input.Undistort(_paramIn.CameraMatrix, _paramIn.DistortionCoeffs);
+            Cv2.Undistort(input.Clone(), input, _paramIn.CameraMatrix, _paramIn.DistortionCoeffs);
             _points = GetPoints(input);
             var steer = CalculateSteer();
             return new(DateTimeOffset.Now, steer);
