@@ -2,7 +2,6 @@
 using System.IO;
 using System.Text.Json;
 using OpenCvSharp;
-using Husty.OpenCvSharp.DepthCamera;
 
 namespace VisualServoCore
 {
@@ -11,46 +10,39 @@ namespace VisualServoCore
 
         private readonly string _name;
         private VideoWriter _cwrt;
-        private BgrXyzRecorder _dwrt;
         private StreamWriter _sw;
 
-        public DataLogger()
+        public DataLogger(Size? size)
         {
             var t = DateTimeOffset.Now;
             _name = $"{t.Year}{t.Month:d2}{t.Day:d2}{t.Hour:d2}{t.Minute:d2}{t.Second}";
             if (!Directory.Exists("log")) Directory.CreateDirectory("log");
             Directory.CreateDirectory("log\\" + _name);
+            _sw = new($"log\\{_name}\\{_name}.json");
+            if (size is not null)
+                _cwrt = new($"log\\{_name}\\{_name}.mp4", FourCC.MPG4, 15, (Size)size);
         }
 
         public void Write(LogObject<T> data)
         {
-            if (_sw is null)
-                _sw = new($"log\\{_name}\\{_name}.json");
-            _sw.WriteLine(JsonSerializer.Serialize(data));
+            if (_sw?.BaseStream is not null)
+                _sw?.WriteLine(JsonSerializer.Serialize(data));
         }
 
         public void Write(Mat frame)
         {
-            if (_cwrt is null)
-                _cwrt = new($"log\\{_name}\\{_name}.mp4", FourCC.MPG4, 15, new(frame.Width, frame.Height));
-            _cwrt.Write(frame);
-        }
-
-        public void Write(BgrXyzMat frame)
-        {
-            if (_dwrt is null)
-                _dwrt = new($"log\\{_name}\\{_name}.yms");
-            _dwrt.WriteFrame(frame);
+            if (!(bool)_cwrt?.IsDisposed)
+                _cwrt?.Write(frame);
         }
 
         public void Dispose()
         {
+            _sw?.Close();
             _sw?.Dispose();
+            _cwrt?.Release();
             _cwrt?.Dispose();
-            _dwrt?.Dispose();
             _sw = null;
             _cwrt = null;
-            _dwrt = null;
         }
 
     }

@@ -71,7 +71,7 @@ namespace VisualServoCore.Controller
             var h = input.Height;
             return _detector.Run(input)
                 .Select(r => r.Box.Scale(w, h).ToRect().GetCenter())
-                .Select(c => _transformer.ConvertToWorldCoordinate(new((int)c.X, (int)c.Y)))
+                .Select(c => _transformer.ConvertToWorldCoordinate(new(c.X, c.Y)))
                 .ToArray();
         }
 

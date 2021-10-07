@@ -12,7 +12,6 @@ using VisualServoCore;
 using VisualServoCore.Vision;
 using VisualServoCore.Communication;
 using VisualServoCore.Controller;
-using Husty.OpenCvSharp;
 
 namespace WpfApp
 {
@@ -40,6 +39,7 @@ namespace WpfApp
         private int _focusWidth;
         private int _maxWidth;
         private int _maxDistance;
+        private readonly OpenCvSharp.Size _size = new(1280, 960);
 
         public MainWindow()
         {
@@ -148,8 +148,8 @@ namespace WpfApp
                     _maxDistance = maxDistance;
                     _maxWidth = maxWidth;
                     _logOn = (bool)LogCheck.IsChecked;
-                    _log = _logOn ? new() : null;
                     _recOn = (bool)RecCheck.IsChecked;
+                    _log = _logOn ? new(_recOn ? _size : null) : null;
                     _visionSelectedIndex = SourceCombo.SelectedIndex;
                 }
                 catch
@@ -174,11 +174,11 @@ namespace WpfApp
                                 .Subscribe(frame =>
                                 {
                                     var view = frame.Clone();
+                                    if (_recOn) _log?.Write(frame);
                                     var obj = _controller.Run(view);
                                     var radar = _controller.GetGroundCoordinateResults();
                                     _steer = obj.Steer;
                                     _log?.Write(obj);
-                                    if (_recOn) _log?.Write(frame);
                                     ProcessUserThread(view, radar);
                                 });
                             VisionButton.Background = Brushes.Red;
@@ -191,11 +191,11 @@ namespace WpfApp
                             .Subscribe(frame =>
                             {
                                 var view = frame.Clone();
+                                if (_recOn) _log?.Write(frame);
                                 var obj = _controller.Run(view);
                                 var radar = _controller.GetGroundCoordinateResults();
                                 _steer = obj.Steer;
                                 _log?.Write(obj);
-                                if (_recOn) _log?.Write(frame);
                                 ProcessUserThread(view, radar);
                             });
                         VisionButton.Background = Brushes.Red;
