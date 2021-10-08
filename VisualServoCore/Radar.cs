@@ -3,11 +3,12 @@ using static OpenCvSharp.Cv2;
 
 namespace VisualServoCore
 {
-    public class Radar
+    internal class Radar
     {
 
         // ------ Fields ------ //
 
+        private readonly Size _size;
         private readonly Scalar _red = new(0, 0, 255);
         private readonly Scalar _green = new(0, 180, 0);
         private readonly Scalar _blue = new(255, 0, 0);
@@ -38,6 +39,7 @@ namespace VisualServoCore
                 Line(_radarCanvas, new Point(left, 0), new Point(left, h), _green, 10);
                 Line(_radarCanvas, new Point(right, 0), new Point(right, h), _green, 10);
             }
+            _size = new(maxWidth * 2 / 10, maxDistance / 10);
         }
 
 
@@ -47,10 +49,10 @@ namespace VisualServoCore
         {
             var radar = _radarCanvas.Clone();
             foreach (var p in points)
-                Circle(radar, GetRadarCoordinate(p), 100, _green, FILLED);
-            if (targetPoint is not null)
-                Line(radar, new Point(radar.Width / 2, radar.Height), GetRadarCoordinate((Point2f)targetPoint), new(180, 180, 180), 14);
-            
+                Circle(radar, GetRadarCoordinate(p), 100, _red, FILLED);
+            if (targetPoint is Point2f point)
+                Line(radar, new Point(radar.Width / 2, radar.Height), GetRadarCoordinate(point), new(180, 180, 180), 14);
+            Cv2.Resize(radar, radar, _size);
             return radar;
         }
 

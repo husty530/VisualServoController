@@ -25,9 +25,9 @@ namespace WpfApp
         // Primary processes
         private IDisposable _stream;
         private DummyCommunication _server;
-        private ColorBasedController _controller;
-        private BGRStream _video;
-        private DataLogger<double> _log;
+        private ErrorEstimator _controller;
+        private ImageStream _video;
+        private VideoRecorder<double> _log;
 
         // Temporary datas and flags
         private string _initDir;

@@ -5,17 +5,17 @@ using System.Reactive.Concurrency;
 using System.Reactive.Linq;
 using OpenCvSharp;
 
-namespace VisualServoCore.Vision
+namespace VisualServoCore
 {
-    public class DummyBGRStream : IVision<Mat>
+
+    public class ImageStream : IDisposable
     {
 
         // ------ Fields ------ //
 
-        private int _frameNumber;
+        private readonly VideoCapture _cap;
         private readonly bool _isFileSource;
         private readonly object _lockObj = new();
-        private readonly Mat _red = new(360, 640, MatType.CV_8UC3, new(0, 0, 180));
 
 
         // ------ Properties ------ //
@@ -29,19 +29,21 @@ namespace VisualServoCore.Vision
 
         // ------ Constructors ------ //
 
-        public DummyBGRStream(int deviceIndex = 0)
+        public ImageStream(int deviceId)
         {
-            Fps = 10;
+            _cap = new(deviceId);
+            Fps = _cap.Fps;
             FrameCount = -1;
-            FrameSize = new(640, 360);
+            FrameSize = new(_cap.FrameWidth, _cap.FrameHeight);
             _isFileSource = false;
         }
 
-        public DummyBGRStream(string sourceFile)
+        public ImageStream(string sourceFile)
         {
-            Fps = 10;
-            FrameCount = 1000;
-            FrameSize = new(640, 360);
+            _cap = new(sourceFile);
+            Fps = _cap.Fps;
+            FrameCount = _cap.FrameCount;
+            FrameSize = new(_cap.FrameWidth, _cap.FrameHeight);
             _isFileSource = true;
         }
 
@@ -50,13 +52,10 @@ namespace VisualServoCore.Vision
 
         public bool Read(ref Mat frame)
         {
-            if (FrameCount != -1 && _frameNumber++ > FrameCount - 1) return false;
-            frame = _red;
-            Thread.Sleep(1000 / (int)Fps);
-            return true;
+            return _cap.Read(frame);
         }
 
-        public IObservable<Mat> Connect()
+        public IObservable<Mat> GetStream()
         {
             var frame = new Mat();
             if (_isFileSource)
@@ -68,38 +67,35 @@ namespace VisualServoCore.Vision
                         {
                             try
                             {
-                                frame = _red;
+                                _cap?.Read(frame);
                                 Thread.Sleep(1000 / (int)Fps);
                             }
                             catch { }
                         }
                         return frame;
-                    })
-                    .Publish().RefCount();
+                    }).Publish().RefCount();
             }
             else
             {
-                return Observable.Range(0, int.MaxValue, ThreadPoolScheduler.Instance)
+                return Observable.Repeat(0, ThreadPoolScheduler.Instance)
                     .Select(_ =>
                     {
                         lock (_lockObj)
                         {
                             try
                             {
-                                frame = _red;
-                                Thread.Sleep(1000 / (int)Fps);
+                                _cap?.Read(frame);
                             }
                             catch { }
                         }
                         return frame;
-                    })
-                    .Publish().RefCount();
+                    }).Publish().RefCount();
             }
         }
 
-        public void Disconnect()
+        public void Dispose()
         {
-
+            _cap?.Dispose();
         }
 
     }

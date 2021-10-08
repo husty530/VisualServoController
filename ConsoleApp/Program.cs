@@ -1,10 +1,6 @@
 ﻿using System;
 using OpenCvSharp;
 using VisualServoCore;
-using VisualServoCore.Vision;
-using VisualServoCore.Controller;
-using VisualServoCore.Communication;
-using Husty.OpenCvSharp;
 
 namespace ConsoleApp
 {
@@ -13,33 +9,31 @@ namespace ConsoleApp
         static void Main(string[] args)
         {
 
-            var gain = 1.0;
-            var maxWidth = 3000;
-            var maxDistance = 8000;
-            var focusWidth = 1500;
+            // Mock Taueki
+            // ↓拾ってください
+            Errors _errors;
 
-            BGRStream cap = new();
-            ColorBasedController controller = new(gain, maxWidth, maxDistance, focusWidth);
-            DummyCommunication server = new();
-            DataLogger<double> log = null;
-            log = new(new(1280, 960));
+            ImageStream cap = new(0);
+            ErrorEstimator estimator = new();
+            VideoRecorder writer = null;
+            //writer = new(new(1280, 960));
 
-            var connector = cap.Connect()
+            var connector = cap.GetStream()
                 .Subscribe(frame =>
                 {
-                    var results = controller.Run(frame);
-                    server.Send(results.Steer);
-                    Cv2.ImShow(" ", frame);
+                    writer?.Write(frame);
+                    _errors = estimator.Run(frame);
+                    using var radar = estimator.GetGroundCoordinateView();
+                    Console.WriteLine($"LateralE = {_errors.LateralError:f2}  : HeadingE = {_errors.HeadingError:f2}");
+                    Cv2.ImShow("FRAME", frame);
+                    Cv2.ImShow("RADAR", radar);
                     Cv2.WaitKey(1);
-                    log?.Write(results);
-                    log?.Write(frame);
                 });
 
             while (Console.ReadKey().Key is not ConsoleKey.Enter) ;
             connector.Dispose();
-            cap.Disconnect();
-            server.Dispose();
-            log?.Dispose();
+            cap.Dispose();
+            writer?.Dispose();
 
         }
     }
