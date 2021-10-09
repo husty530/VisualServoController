@@ -31,6 +31,7 @@ namespace VisualServoCore.Controller
 
             // initialize detector instance and some parameters
 
+            // ここは見なくていいです
             var cfg = "..\\..\\..\\..\\..\\model\\_.cfg";
             var weights = "..\\..\\..\\..\\..\\model\\_.weights";
             var names = "..\\..\\..\\..\\..\\model\\_.names";
@@ -47,6 +48,7 @@ namespace VisualServoCore.Controller
 
         public LogObject<short> Run(BgrXyzMat input)
         {
+            // ここは見なくていいです
             _points = FindBoxes(input).Select(r => GetXZ(input, r)).Where(xz => xz is not null).Select(xz => (Point)xz).ToArray();
             _targetPoint = SelectTarget(input, _points) ?? null;
             if (_targetPoint is Point target)
@@ -67,6 +69,7 @@ namespace VisualServoCore.Controller
 
         private Rect[] FindBoxes(BgrXyzMat input)
         {
+            // ここは見なくていいです
             var w = input.BGR.Width;
             var h = input.BGR.Height;
             var results = _detector.Run(input.BGR);
@@ -83,6 +86,7 @@ namespace VisualServoCore.Controller
 
         private Point? GetXZ(BgrXyzMat input, Rect box)
         {
+            // ここは見なくていいです
             try
             {
                 var targetX = 0;
@@ -114,12 +118,23 @@ namespace VisualServoCore.Controller
         private Point? SelectTarget(BgrXyzMat input, Point[] points)
         {
             if (points.Length is 0) return null;
+
+            // ここを埋めてください。
+            // 取得した点たち(points)とそれらに含まれる3D情報(input)からターゲットを決めるところです。
+            // 距離の閾値としてX方向は_maxWidth, Y方向は_maxDistanceなどのフィールドがユーザー入力で使えます。
+
             var target = points[0];
             return target;
         }
 
         private double CalculateSteer(Point point)
         {
+
+            // ここを埋めてください
+            // ターゲット点を使ってCANに流すステアリング角を返す関数を書くところです。
+            // 出力はshort型(整数)で、degreeの10倍だそうです。(例：15度→戻り値は150)
+            // _gainというフィールドがユーザー入力で使えるようにしています。
+
             return 0;
         }
 

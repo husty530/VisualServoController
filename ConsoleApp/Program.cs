@@ -14,10 +14,6 @@ namespace ConsoleApp
     {
         static void Main(string[] args)
         {
-
-            //IVision<Mat> cap = new DummyBGRStream();
-            //IController<Mat> controller = new DummyColorBasedController();
-
             var gain = 1.0;
             var maxWidth = 3000;
             var maxDistance = 8000;
