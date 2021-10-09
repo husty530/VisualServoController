@@ -19,21 +19,26 @@ namespace VisualServoCore
         private readonly ExtrinsicCameraParameters _paramEx;
         private readonly PerspectiveTransformer _transformer;
         private readonly YoloDetector _detector;
+        private readonly Radar _radar;
+        private Point2f[] _points;
+
+        // 見る範囲を制限したければここで
+        // 射影変換後の座標系XY(mm)です
         private const int _maxWidth = 3000;
         private const int _maxDistance = 8000;
         private const int _focusWidth = 1500;
-        private readonly Radar _radar;
-        private Point2f[] _points;
 
 
         // ------ Constructors ------ //
 
         public ErrorEstimator()
         {
+            // カメラキャリブレーションファイル置き場
             _paramIn = IntrinsicCameraParameters.Load("..\\..\\..\\..\\calib\\dummy-intrinsic.json");
             _paramEx = ExtrinsicCameraParameters.Load("..\\..\\..\\..\\calib\\dummy-extrinsic.json");
             _transformer = new(_paramIn.CameraMatrix, _paramEx);
 
+            // YOLOのモデル置き場
             var cfg = "..\\..\\..\\..\\model\\_.cfg";
             var weights = "..\\..\\..\\..\\model\\_.weights";
             var names = "..\\..\\..\\..\\model\\_.names";
@@ -47,6 +52,7 @@ namespace VisualServoCore
 
         public Errors Run(Mat frame)
         {
+            // このへんは見なくていいです
             Cv2.Resize(frame, frame, _size);
             using var copy = frame.Clone();
             Cv2.Undistort(copy, frame, _paramIn.CameraMatrix, _paramIn.DistortionCoeffs);
@@ -77,6 +83,9 @@ namespace VisualServoCore
 
         private Errors DoEstimateErrors(IEnumerable<Point2f> points)
         {
+            
+            // ここを埋めてください
+
             var errors = new Errors(0, 0);
             return errors;
         }
