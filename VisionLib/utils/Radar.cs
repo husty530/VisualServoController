@@ -1,7 +1,7 @@
 ﻿using OpenCvSharp;
 using static OpenCvSharp.Cv2;
 
-namespace VisualServoCore
+namespace VisionLib
 {
     internal class Radar
     {

@@ -2,7 +2,7 @@
 using System.IO;
 using OpenCvSharp;
 
-namespace VisualServoCore
+namespace VisionLib
 {
 
     public class VideoRecorder : IDisposable

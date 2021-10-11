@@ -2,7 +2,7 @@
 using System.Linq;
 using OpenCvSharp;
 
-namespace VisualServoCore
+namespace VisionLib
 {
     internal static class Graphics
     {

@@ -4,12 +4,12 @@ using System.Collections.Generic;
 using OpenCvSharp;
 using Husty.OpenCvSharp;
 
-namespace VisualServoCore
+namespace VisionLib
 {
 
     public record Errors(double LateralError, double HeadingError);
 
-    public class ErrorEstimator
+    internal class VisualErrorEstimator
     {
 
         // ------ Fields ------ //
@@ -31,7 +31,7 @@ namespace VisualServoCore
 
         // ------ Constructors ------ //
 
-        public ErrorEstimator()
+        internal VisualErrorEstimator()
         {
             // カメラキャリブレーションファイル置き場
             _paramIn = IntrinsicCameraParameters.Load("..\\..\\..\\..\\calib\\dummy-intrinsic.json");
@@ -50,7 +50,7 @@ namespace VisualServoCore
 
         // ------ Public Methods ------ //
 
-        public Errors Run(Mat frame)
+        internal Errors Run(Mat frame)
         {
             // このへんは見なくていいです
             Cv2.Resize(frame, frame, _size);
@@ -60,7 +60,7 @@ namespace VisualServoCore
             return DoEstimateErrors(_points);
         }
 
-        public Mat GetGroundCoordinateView()
+        internal Mat GetGroundCoordinateView()
         {
             return _radar.GetRadar(_points, null);
         }

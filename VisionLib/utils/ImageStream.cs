@@ -5,10 +5,10 @@ using System.Reactive.Concurrency;
 using System.Reactive.Linq;
 using OpenCvSharp;
 
-namespace VisualServoCore
+namespace VisionLib
 {
 
-    public class ImageStream : IDisposable
+    internal class ImageStream : IDisposable
     {
 
         // ------ Fields ------ //
