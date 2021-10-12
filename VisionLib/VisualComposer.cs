@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 using OpenCvSharp;
+using Husty;
 
 namespace VisionLib
 {
